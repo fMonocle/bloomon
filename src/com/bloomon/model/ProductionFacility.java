@@ -34,7 +34,9 @@ public class ProductionFacility {
 		//There is an error after remove bouquet
 		for (Iterator <BouquetRule> iterator = bouquetRules.iterator(); iterator.hasNext();) {
 			BouquetRule bouquetRule = (BouquetRule) iterator.next();
-			result = checkRule(bouquetRule);
+			if (!bouquetRule.isBouquetCompleted()) {
+				result = checkRule(bouquetRule);
+			}
 		}
 		if (result != null) {
 			return result;
@@ -44,7 +46,6 @@ public class ProductionFacility {
 	
 	private String checkRule(BouquetRule bouquetRule) {
 		Boolean success = true;
-		
 		for (Iterator <FlowerRule> iterator = bouquetRule.getFlowerRules().iterator(); iterator.hasNext() && success;) {
 			FlowerRule flowerRule = (FlowerRule) iterator.next();
 			if (!flowersInStock(flowerRule)) {
@@ -65,28 +66,37 @@ public class ProductionFacility {
 				fRules += flowerRule.getQuantity()+flowerRule.getIdentifier();
 			}
 			
-			
 			Iterator<BouquetRule> it = bouquetRules.iterator();
 			BouquetRule bRule;
 			
-			//Hago el remove del bouquet cumplido
 			while (it.hasNext()) {
 				bRule = it.next();
 			    if (bRule.equals(bouquetRule)) {
-			        it.remove();
+			    	if (isTotalOK(bRule)) {
+			    		bRule.setBouquetCompleted(true);
+					} else {
+						Integer totalFlowersOfbRule = 0;
+						for (Iterator<FlowerRule> iterator = bRule.getFlowerRules().iterator(); iterator.hasNext();) {
+							FlowerRule flowerRule = (FlowerRule) iterator.next();
+							totalFlowersOfbRule += flowerRule.getQuantity();
+						}
+						
+						Integer flowersToComplete = bRule.getTotal() - totalFlowersOfbRule;
+						if (flowersToComplete > flowersStock.size()) {
+							//I couldn´t finish the case of the total difference.
+						}
+					}
 			    }
 			}
 			
-			return "Bouquete: "+ bouqueteId + bouqueteSize+fRules;
+			return "Bouquet: "+ bouqueteId + bouqueteSize+fRules;
 		}
 		return null;
 	}
 	
 	private boolean flowersInStock(FlowerRule flowerRule) {
-		
 		int flowerRuleQuantity = flowerRule.getQuantity();
 		int flowerTypeQuantity = 0;
-		
 		for (Iterator <Flower> iterator = flowersStock.iterator(); iterator.hasNext();) {
 			Flower flower = (Flower) iterator.next();
 			if (flower.getSize().equals(flowerRule.getSize())) {
@@ -102,9 +112,23 @@ public class ProductionFacility {
 			return true;
 		}
 	}
+	
+	public boolean isTotalOK(BouquetRule bRule) {
+		Integer totalOfFlowers = 0;
+		for (Iterator<FlowerRule> iterator = bRule.getFlowerRules().iterator(); iterator.hasNext();) {
+			FlowerRule flowerRule = (FlowerRule) iterator.next();
+			totalOfFlowers += flowerRule.getQuantity();
+		}
+		
+		if (totalOfFlowers.equals(bRule.getTotal())) {
+			return true;
+		}
+			
+		return false;
+	}
 
 	public boolean isCompleted() {
-		// TODO Auto-generated method stub
+		//Esto es por production facility
 		return false;
 	}
 

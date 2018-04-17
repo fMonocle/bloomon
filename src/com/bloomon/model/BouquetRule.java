@@ -9,6 +9,7 @@ public class BouquetRule {
 	private String size; // L S
 	private Integer total; // The total of flowers of the rule.
 	private List<FlowerRule> flowerRules;
+	private boolean bouquetCompleted = false;
 	
 	public BouquetRule(String ruleString) {
 		/*
@@ -80,9 +81,13 @@ public class BouquetRule {
 		this.flowerRules = flowerRules;
 	}
 
+	public boolean isBouquetCompleted() {
+		return bouquetCompleted;
+	}
 
+	public void setBouquetCompleted(boolean bouquetCompleted) {
+		this.bouquetCompleted = bouquetCompleted;
+	}
 
-	
-	
 	
 }
